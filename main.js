@@ -76,10 +76,52 @@ module.exports =
 "use strict";
 
 exports.__esModule = true;
+var SpawnManager = __webpack_require__(/*! ./components/spawnManager */ 1);
+var CreepManager = __webpack_require__(/*! ./components/creepManager */ 2);
 function mainLoop() {
-    console.log('hi');
+    for (var i in Game.rooms) {
+        var room = Game.rooms[i];
+        SpawnManager.run(room);
+        CreepManager.run(room);
+    }
 }
 exports.loop = mainLoop;
+
+
+/***/ }),
+/* 1 */
+/*!******************************************************************************************************!*\
+  !*** C:/Users/Thom/AppData/Local/Screeps/scripts/screeps.com/default/src/components/spawnManager.ts ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+function run(room) {
+    console.log('sM runs', room);
+}
+exports.run = run;
+
+
+/***/ }),
+/* 2 */
+/*!******************************************************************************************************!*\
+  !*** C:/Users/Thom/AppData/Local/Screeps/scripts/screeps.com/default/src/components/creepManager.ts ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+function run(room) {
+    console.log('cM runs', room);
+}
+exports.run = run;
 
 
 /***/ })
