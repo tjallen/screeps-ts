@@ -2,6 +2,7 @@ import * as Config from './config';
 import * as SpawnManager from './components/spawnManager';
 import * as CreepManager from './components/creepManager';
 import * as Profiler from 'screeps-profiler';
+import * as Utils from './utils';
 
 if (Config.ENABLE_PROFILER) {
   Profiler.enable();
@@ -10,7 +11,6 @@ if (Config.ENABLE_PROFILER) {
 function mainLoop() {
   for (let i in Game.rooms) {
     const room: Room = Game.rooms[i];
-    
     SpawnManager.run(room);
     CreepManager.run(room);
   }
