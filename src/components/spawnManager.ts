@@ -15,7 +15,14 @@ function spawnRequiredCreep(spawn: Spawn, parts: string[], role: string) {
   console.log('spawnRequiredCreep()', spawn, parts, role)
   const spawnStatus: number | string = spawn.canCreateCreep(parts, undefined);
   if (spawnStatus === OK) {
-    spawn.createCreep(parts, null, { role: role });
+    spawn.createCreep(
+      parts,
+      null,
+      {
+        role: role,
+        spawnRoom: spawn.pos.roomName,
+      }
+    );
   } else {
     if (Config.ENABLE_DEBUG) {
       console.log('sRC() failed creating new creep', spawnStatus)

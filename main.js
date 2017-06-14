@@ -17248,7 +17248,10 @@ function spawnRequiredCreep(spawn, parts, role) {
     console.log('spawnRequiredCreep()', spawn, parts, role);
     var spawnStatus = spawn.canCreateCreep(parts, undefined);
     if (spawnStatus === OK) {
-        spawn.createCreep(parts, null, { role: role });
+        spawn.createCreep(parts, null, {
+            role: role,
+            spawnRoom: spawn.pos.roomName
+        });
     }
     else {
         if (Config.ENABLE_DEBUG) {
