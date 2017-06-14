@@ -17291,7 +17291,6 @@ function run(room) {
         else {
             roles_1["default"][creep.memory.role].run(creep);
         }
-        // catch unknown role
     });
 }
 exports.run = run;
@@ -17699,7 +17698,15 @@ module.exports = {
 "use strict";
 
 exports.__esModule = true;
-var module = {};
+var module = {
+    body: [WORK, CARRY, MOVE],
+    count: {
+        1: 4,
+        2: 3,
+        3: 2,
+        4: 1
+    }
+};
 module.run = function run(creep) {
     creep.say("worker");
 };

@@ -12,6 +12,5 @@ export function run(room: Room) {
     } else {
       Roles[creep.memory.role].run(creep);
     }
-    // catch unknown role
   });
 }
