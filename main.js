@@ -78,6 +78,7 @@ module.exports =
 exports.__esModule = true;
 exports.ENABLE_PROFILER = true;
 exports.ENABLE_DEBUG = true;
+exports.DEBUG_THROTTLE = 1;
 exports.CREEP_COUNT_WORKER = {
     RCL: {
         1: 4,
@@ -17228,13 +17229,14 @@ if (Config.ENABLE_PROFILER) {
     Profiler.enable();
 }
 function mainLoop() {
-    console.log("==== " + Game.time + " ====");
     var ALL_CREEPS_SORTED = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
     CreepManager.run(Game.creeps);
     for (var i in Game.rooms) {
         var room = Game.rooms[i];
         var roomCreeps = ALL_CREEPS_SORTED[room.name];
         SpawnManager.run(room, roomCreeps);
+        if (Config.ENABLE_DEBUG)
+            Utils.debugInfo(room, roomCreeps);
     }
 }
 exports.loop = Config.ENABLE_PROFILER ? Profiler.wrap(mainLoop) : mainLoop;
@@ -17290,7 +17292,6 @@ function run(room, roomCreeps) {
     for (var role in roles_1["default"]) {
         var max = roles_1["default"][role].count[room.controller.level];
         var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
-        console.log("===> " + room + " " + role + ":[" + current + "/" + max + "]");
         if (current < max) {
             spawnRequiredCreep(room, roles_1["default"][role].body, role);
         }
@@ -17761,6 +17762,8 @@ module.exports = {
 
 exports.__esModule = true;
 var _ = __webpack_require__(/*! lodash */ 2);
+var Config = __webpack_require__(/*! ../config */ 0);
+var roles_1 = __webpack_require__(/*! ./../roles */ 1);
 function creepsByRole(role) {
     return _.filter(Game.creeps, function (c) { return c.memory.role === role; });
 }
@@ -17777,6 +17780,22 @@ function nestedGroupBy(arr, keys) {
     return _.mapValues(_.groupBy(arr, first), function (value) { return nestedGroupBy(value, rest); });
 }
 exports.nestedGroupBy = nestedGroupBy;
+;
+function debugInfo(room, roomCreeps) {
+    if (Game.time % Config.DEBUG_THROTTLE === 0) {
+        console.log('=========================');
+        console.log(room + " at " + Game.time);
+        console.log(room.energyAvailable + " / " + room.energyCapacityAvailable + "e");
+        for (var role in roles_1["default"]) {
+            var max = roles_1["default"][role].count[room.controller.level];
+            var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
+            console.log(role + ":[" + current + "/" + max + "]");
+        }
+        ;
+    }
+    ;
+}
+exports.debugInfo = debugInfo;
 ;
 
 

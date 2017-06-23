@@ -44,7 +44,6 @@ export function run(room: Room, roomCreeps: object | undefined) {
   for (let role in Roles) {
     let max: number = Roles[role].count[room.controller.level];
     let current: number = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
-    console.log(`===> ${room} ${role}:[${current}/${max}]`);
     if (current < max) {
       spawnRequiredCreep(room, Roles[role].body, role);
     }

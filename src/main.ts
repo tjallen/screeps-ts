@@ -10,7 +10,6 @@ if (Config.ENABLE_PROFILER) {
 }
 
 function mainLoop() {
-  console.log(`==== ${Game.time} ====`)
   // top level creeps object, nested tree by room > role > creeps
   const ALL_CREEPS_SORTED: object = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
   // console.log(JSON.stringify(ALL_CREEPS_SORTED, null, 2))
@@ -21,6 +20,7 @@ function mainLoop() {
     let room: Room = Game.rooms[i];
     let roomCreeps: object = ALL_CREEPS_SORTED[room.name];
     SpawnManager.run(room, roomCreeps);
+    if (Config.ENABLE_DEBUG) Utils.debugInfo(room, roomCreeps);
   }
 }
 
