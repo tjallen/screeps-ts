@@ -10,7 +10,7 @@ if (Config.ENABLE_PROFILER) {
 }
 
 function mainLoop() {
-  console.log(`=== ${Game.time} ===`)
+  console.log(`==== ${Game.time} ====`)
   // top level creeps object, nested tree by room > role > creeps
   const ALL_CREEPS_SORTED: object = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
   // console.log(JSON.stringify(ALL_CREEPS_SORTED, null, 2))
@@ -23,9 +23,5 @@ function mainLoop() {
     SpawnManager.run(room, roomCreeps);
   }
 }
-
-
-
-
 
 export const loop = Config.ENABLE_PROFILER ? Profiler.wrap(mainLoop) : mainLoop;

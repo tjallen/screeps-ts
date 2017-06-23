@@ -61,11 +61,57 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/*!*****************************!*\
+  !*** ./src/config/index.ts ***!
+  \*****************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.ENABLE_PROFILER = true;
+exports.ENABLE_DEBUG = true;
+exports.CREEP_COUNT_WORKER = {
+    RCL: {
+        1: 4,
+        2: 3,
+        3: 2,
+        4: 1
+    }
+};
+exports.BODY_WORKER = [WORK, CARRY, MOVE];
+
+
+/***/ }),
+/* 1 */
+/*!****************************!*\
+  !*** ./src/roles/index.ts ***!
+  \****************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var worker_1 = __webpack_require__(/*! ./worker */ 5);
+var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 6);
+var roles = {
+    worker: worker_1["default"],
+    fakeRole: fakeRole_1["default"]
+};
+exports["default"] = roles;
+
+
+/***/ }),
+/* 2 */
 /*!***************************************!*\
   !*** ./node_modules/lodash/lodash.js ***!
   \***************************************/
@@ -17159,42 +17205,10 @@ module.exports =
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 3)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 8)(module)))
 
 /***/ }),
-/* 1 */
-/*!*****************************!*\
-  !*** ./src/config/index.ts ***!
-  \*****************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-// true enables screeps-profiler
-exports.ENABLE_PROFILER = true;
-// true enables debug msgs
-exports.ENABLE_DEBUG = true;
-// generic worker count
-// TODO move to worker.ts
-// TODO edit count depending on sources & available tiles
-exports.CREEP_COUNT_WORKER = {
-    RCL: {
-        1: 4,
-        2: 3,
-        3: 2,
-        4: 1
-    }
-};
-// generic worker body
-// TODO multiply body size depending on RCL / energy avail
-exports.BODY_WORKER = [WORK, CARRY, MOVE];
-
-
-/***/ }),
-/* 2 */
+/* 3 */
 /*!*********************!*\
   !*** ./src/main.ts ***!
   \*********************/
@@ -17205,22 +17219,18 @@ exports.BODY_WORKER = [WORK, CARRY, MOVE];
 "use strict";
 
 exports.__esModule = true;
-var Config = __webpack_require__(/*! ./config */ 1);
+var Config = __webpack_require__(/*! ./config */ 0);
 var SpawnManager = __webpack_require__(/*! ./components/spawnManager */ 4);
-var CreepManager = __webpack_require__(/*! ./components/creepManager */ 5);
+var CreepManager = __webpack_require__(/*! ./components/creepManager */ 7);
 var Profiler = __webpack_require__(/*! screeps-profiler */ 9);
 var Utils = __webpack_require__(/*! ./utils */ 10);
 if (Config.ENABLE_PROFILER) {
     Profiler.enable();
 }
 function mainLoop() {
-    console.log("=== " + Game.time + " ===");
-    // top level creeps object, nested tree by room > role > creeps
+    console.log("==== " + Game.time + " ====");
     var ALL_CREEPS_SORTED = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
-    // console.log(JSON.stringify(ALL_CREEPS_SORTED, null, 2))
-    // run creep manager for each creep
     CreepManager.run(Game.creeps);
-    // run spawn manager for each room
     for (var i in Game.rooms) {
         var room = Game.rooms[i];
         var roomCreeps = ALL_CREEPS_SORTED[room.name];
@@ -17231,7 +17241,147 @@ exports.loop = Config.ENABLE_PROFILER ? Profiler.wrap(mainLoop) : mainLoop;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
+/*!****************************************!*\
+  !*** ./src/components/spawnManager.ts ***!
+  \****************************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var Config = __webpack_require__(/*! ./../config */ 0);
+var roles_1 = __webpack_require__(/*! ./../roles */ 1);
+function availableSpawns(room) {
+    var spawns = room.find(FIND_MY_SPAWNS, {
+        filter: function (spawn) {
+            return spawn.spawning === null;
+        }
+    });
+    console.log("availableSpawns() " + spawns.length + " spawns available");
+    if (spawns.length === 0)
+        return false;
+    return spawns;
+}
+function spawnRequiredCreep(room, parts, role) {
+    var spawns = availableSpawns(room);
+    if (!spawns) {
+        console.log("sRC() no spawns currently available, probably busy. returning");
+        return;
+    }
+    var spawn = spawns[0];
+    console.log('spawnRequiredCreep()', spawn, parts, role);
+    var spawnStatus = spawn.canCreateCreep(parts, undefined);
+    if (spawnStatus === OK) {
+        spawn.createCreep(parts, null, {
+            role: role,
+            spawnRoom: spawn.pos.roomName
+        });
+    }
+    else {
+        if (Config.ENABLE_DEBUG) {
+            console.log('sRC() failed creating new creep', spawnStatus);
+        }
+    }
+}
+function run(room, roomCreeps) {
+    for (var role in roles_1["default"]) {
+        var max = roles_1["default"][role].count[room.controller.level];
+        var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
+        console.log("===> " + room + " " + role + ":[" + current + "/" + max + "]");
+        if (current < max) {
+            spawnRequiredCreep(room, roles_1["default"][role].body, role);
+        }
+    }
+}
+exports.run = run;
+
+
+/***/ }),
+/* 5 */
+/*!*****************************!*\
+  !*** ./src/roles/worker.ts ***!
+  \*****************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var module = {
+    body: [WORK, CARRY, MOVE],
+    count: {
+        1: 4,
+        2: 3,
+        3: 2,
+        4: 1
+    }
+};
+module.run = function run(creep) {
+    creep.say("worker");
+};
+exports["default"] = module;
+
+
+/***/ }),
+/* 6 */
+/*!*******************************!*\
+  !*** ./src/roles/fakeRole.ts ***!
+  \*******************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var module = {
+    body: [MOVE],
+    count: {
+        1: 1,
+        2: 1,
+        3: 1,
+        4: 1
+    }
+};
+module.run = function run(creep) {
+    creep.say("fakeRole");
+};
+exports["default"] = module;
+
+
+/***/ }),
+/* 7 */
+/*!****************************************!*\
+  !*** ./src/components/creepManager.ts ***!
+  \****************************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var _ = __webpack_require__(/*! lodash */ 2);
+var roles_1 = __webpack_require__(/*! ./../roles */ 1);
+function run(creeps) {
+    _.forEach(creeps, function (creep) {
+        if ((!creep.memory.role) || (!roles_1["default"].hasOwnProperty(creep.memory.role))) {
+            console.log("[ERR] attempting role.run(): No role in memory or unknown role [" + creep.name + " in " + creep.pos.roomName + "]");
+        }
+        else {
+            roles_1["default"][creep.memory.role].run(creep);
+        }
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 8 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -17261,170 +17411,6 @@ module.exports = function(module) {
 	}
 	return module;
 };
-
-
-/***/ }),
-/* 4 */
-/*!****************************************!*\
-  !*** ./src/components/spawnManager.ts ***!
-  \****************************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var Config = __webpack_require__(/*! ./../config */ 1);
-var roles_1 = __webpack_require__(/*! ./../roles */ 6);
-function availableSpawns(room) {
-    var spawns = room.find(FIND_MY_SPAWNS, {
-        filter: function (spawn) {
-            return spawn.spawning === null;
-        }
-    });
-    console.log("availableSpawns() " + spawns.length + " spawns available");
-    return spawns;
-}
-function spawnRequiredCreep(spawn, parts, role) {
-    console.log('spawnRequiredCreep()', spawn, parts, role);
-    var spawnStatus = spawn.canCreateCreep(parts, undefined);
-    if (spawnStatus === OK) {
-        spawn.createCreep(parts, null, {
-            role: role,
-            spawnRoom: spawn.pos.roomName
-        });
-    }
-    else {
-        if (Config.ENABLE_DEBUG) {
-            console.log('sRC() failed creating new creep', spawnStatus);
-        }
-    }
-}
-function run(room, roomCreeps) {
-    // console.log(`spawnManager() running in ${room} ${room.energyAvailable}/${room.energyCapacityAvailable}e`);
-    // TODO check creep counts in room vs config counts
-    if (roomCreeps === undefined)
-        for (var role in roles_1["default"]) {
-            // console.log('!', JSON.stringify(Roles[role], null, 2));
-            var max = roles_1["default"][role].count[room.controller.level];
-            var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
-            console.log("===> " + room + " " + role + ":[" + current + "/" + max + "]");
-            if (current < max) {
-                spawnRequiredCreep(availableSpawns(room)[0], roles_1["default"][role].body, role);
-            }
-        }
-    // // check room energy available, if its enough spawn creeps
-    // if (room.energyAvailable === room.energyCapacityAvailable) {
-    //   
-    // }
-}
-exports.run = run;
-
-
-/***/ }),
-/* 5 */
-/*!****************************************!*\
-  !*** ./src/components/creepManager.ts ***!
-  \****************************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var _ = __webpack_require__(/*! lodash */ 0);
-var roles_1 = __webpack_require__(/*! ./../roles */ 6);
-function run(creeps) {
-    // fire role.run() for each creep
-    _.forEach(creeps, function (creep) {
-        // console.log('=>', creep)
-        // creep.suicide()
-        if ((!creep.memory.role) || (!roles_1["default"].hasOwnProperty(creep.memory.role))) {
-            console.log("[ERR] attempting role.run(): No role in memory or unknown role [" + creep.name + " in " + creep.pos.roomName + "]");
-        }
-        else {
-            roles_1["default"][creep.memory.role].run(creep);
-        }
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 6 */
-/*!****************************!*\
-  !*** ./src/roles/index.ts ***!
-  \****************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var worker_1 = __webpack_require__(/*! ./worker */ 7);
-var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 8);
-var roles = {
-    worker: worker_1["default"],
-    fakeRole: fakeRole_1["default"]
-};
-exports["default"] = roles;
-
-
-/***/ }),
-/* 7 */
-/*!*****************************!*\
-  !*** ./src/roles/worker.ts ***!
-  \*****************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var module = {
-    body: [WORK, CARRY, MOVE],
-    count: {
-        1: 4,
-        2: 3,
-        3: 2,
-        4: 1
-    }
-};
-module.run = function run(creep) {
-    creep.say("worker");
-};
-exports["default"] = module;
-
-
-/***/ }),
-/* 8 */
-/*!*******************************!*\
-  !*** ./src/roles/fakeRole.ts ***!
-  \*******************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var module = {
-    body: [MOVE],
-    count: {
-        1: 1,
-        2: 1,
-        3: 1,
-        4: 1
-    }
-};
-module.run = function run(creep) {
-    creep.say("fakeRole");
-};
-exports["default"] = module;
 
 
 /***/ }),
@@ -17774,7 +17760,7 @@ module.exports = {
 "use strict";
 
 exports.__esModule = true;
-var _ = __webpack_require__(/*! lodash */ 0);
+var _ = __webpack_require__(/*! lodash */ 2);
 function creepsByRole(role) {
     return _.filter(Game.creeps, function (c) { return c.memory.role === role; });
 }
@@ -17783,8 +17769,6 @@ function creepCountByRole(role) {
     return _.size(creepsByRole(role));
 }
 exports.creepCountByRole = creepCountByRole;
-// multi-level groupBy
-// https://gist.github.com/joyrexus/9837596
 function nestedGroupBy(arr, keys) {
     if (!keys.length) {
         return arr;

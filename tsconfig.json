@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "removeComments": true
   },
   "include": ["./src/**/*.ts", "./node_modules/screeps-typescript-declarations/dist/screeps.d.ts"]
 }
