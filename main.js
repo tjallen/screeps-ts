@@ -17783,13 +17783,20 @@ exports.nestedGroupBy = nestedGroupBy;
 ;
 function debugInfo(room, roomCreeps) {
     if (Game.time % Config.DEBUG_THROTTLE === 0) {
-        console.log('=========================');
-        console.log(room + " at " + Game.time);
-        console.log(room.energyAvailable + " / " + room.energyCapacityAvailable + "e");
+        console.log('<span style="color: slategray">=========================</span>');
+        console.log("<span style=\"font-size: 16px;color: springgreen\">" + room + " at " + Game.time + "</span>");
+        console.log('<span style="color: cornflowerblue">CONTROLLER</span>');
+        console.log("Level " + room.controller.level);
+        console.log("Progress " + room.controller.progress + "/" + room.controller.progressTotal + " (" + room.controller.progress / room.controller.progressTotal + "%)");
+        if (room.controller.ticksToDowngrade < 20000)
+            console.log("<span style=\"color: tomato\">Downgrade in " + room.controller.ticksToDowngrade + " ticks</span>");
+        console.log('<span style="color: cornflowerblue">STRUCTURES</span>');
+        console.log("Energy " + room.energyAvailable + " / " + room.energyCapacityAvailable + " capacity");
+        console.log('<span style="color: cornflowerblue">CREEPS</span>');
         for (var role in roles_1["default"]) {
             var max = roles_1["default"][role].count[room.controller.level];
             var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
-            console.log(role + ":[" + current + "/" + max + "]");
+            console.log(role + ": [" + current + "/" + max + "]");
         }
         ;
     }
