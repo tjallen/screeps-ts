@@ -1,3 +1,4 @@
+import { actions } from './../actions';
 const module : any = {
   body: <string[]> [WORK, CARRY, MOVE],
   count: <object> {
@@ -8,6 +9,6 @@ const module : any = {
   }
 };
 module.run = function run(creep: Creep) {
-  creep.say(`worker`);
+  actions.harvest(creep);
 }
 export default module;

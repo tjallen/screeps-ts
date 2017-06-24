@@ -103,7 +103,7 @@ exports.BODY_WORKER = [WORK, CARRY, MOVE];
 
 exports.__esModule = true;
 var worker_1 = __webpack_require__(/*! ./worker */ 5);
-var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 6);
+var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 8);
 var roles = {
     worker: worker_1["default"],
     fakeRole: fakeRole_1["default"]
@@ -17206,7 +17206,7 @@ exports["default"] = roles;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 8)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 10)(module)))
 
 /***/ }),
 /* 3 */
@@ -17222,9 +17222,9 @@ exports["default"] = roles;
 exports.__esModule = true;
 var Config = __webpack_require__(/*! ./config */ 0);
 var SpawnManager = __webpack_require__(/*! ./components/spawnManager */ 4);
-var CreepManager = __webpack_require__(/*! ./components/creepManager */ 7);
-var Profiler = __webpack_require__(/*! screeps-profiler */ 9);
-var Utils = __webpack_require__(/*! ./utils */ 10);
+var CreepManager = __webpack_require__(/*! ./components/creepManager */ 9);
+var Profiler = __webpack_require__(/*! screeps-profiler */ 11);
+var Utils = __webpack_require__(/*! ./utils */ 12);
 if (Config.ENABLE_PROFILER) {
     Profiler.enable();
 }
@@ -17312,6 +17312,7 @@ exports.run = run;
 "use strict";
 
 exports.__esModule = true;
+var actions_1 = __webpack_require__(/*! ./../actions */ 13);
 var module = {
     body: [WORK, CARRY, MOVE],
     count: {
@@ -17322,13 +17323,49 @@ var module = {
     }
 };
 module.run = function run(creep) {
-    creep.say("worker");
+    actions_1.actions.harvest(creep);
 };
 exports["default"] = module;
 
 
 /***/ }),
 /* 6 */
+/*!********************************!*\
+  !*** ./src/actions/harvest.ts ***!
+  \********************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+function harvest(creep) {
+    creep.say("harvest");
+}
+exports.harvest = harvest;
+
+
+/***/ }),
+/* 7 */
+/*!***********************************!*\
+  !*** ./src/actions/fakeAction.ts ***!
+  \***********************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+function fakeAction(creep) {
+    creep.say("fakeAction");
+}
+exports.fakeAction = fakeAction;
+
+
+/***/ }),
+/* 8 */
 /*!*******************************!*\
   !*** ./src/roles/fakeRole.ts ***!
   \*******************************/
@@ -17339,6 +17376,7 @@ exports["default"] = module;
 "use strict";
 
 exports.__esModule = true;
+var actions_1 = __webpack_require__(/*! ./../actions */ 13);
 var module = {
     body: [MOVE],
     count: {
@@ -17349,13 +17387,13 @@ var module = {
     }
 };
 module.run = function run(creep) {
-    creep.say("fakeRole");
+    actions_1.actions.fakeAction(creep);
 };
 exports["default"] = module;
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /*!****************************************!*\
   !*** ./src/components/creepManager.ts ***!
   \****************************************/
@@ -17382,7 +17420,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -17415,7 +17453,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /*!***********************************************************!*\
   !*** ./node_modules/screeps-profiler/screeps-profiler.js ***!
   \***********************************************************/
@@ -17750,7 +17788,7 @@ module.exports = {
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /*!****************************!*\
   !*** ./src/utils/index.ts ***!
   \****************************/
@@ -17804,6 +17842,26 @@ function debugInfo(room, roomCreeps) {
 }
 exports.debugInfo = debugInfo;
 ;
+
+
+/***/ }),
+/* 13 */
+/*!******************************!*\
+  !*** ./src/actions/index.ts ***!
+  \******************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var harvest_1 = __webpack_require__(/*! ./harvest */ 6);
+var fakeAction_1 = __webpack_require__(/*! ./fakeAction */ 7);
+exports.actions = {
+    harvest: harvest_1.harvest,
+    fakeAction: fakeAction_1.fakeAction
+};
 
 
 /***/ })

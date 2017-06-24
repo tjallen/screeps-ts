@@ -1,3 +1,4 @@
+import { actions } from './../actions';
 const module : any = {
   body: <string[]> [MOVE],
   count: <object> {
@@ -8,6 +9,6 @@ const module : any = {
   }
 };
 module.run = function run(creep: Creep) {
-  creep.say(`fakeRole`);
+  actions.fakeAction(creep);
 }
 export default module;
