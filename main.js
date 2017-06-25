@@ -17821,14 +17821,6 @@ exports.__esModule = true;
 var _ = __webpack_require__(/*! lodash */ 3);
 var Config = __webpack_require__(/*! ../config */ 0);
 var roles_1 = __webpack_require__(/*! ./../roles */ 1);
-function creepsByRole(role) {
-    return _.filter(Game.creeps, function (c) { return c.memory.role === role; });
-}
-exports.creepsByRole = creepsByRole;
-function creepCountByRole(role) {
-    return _.size(creepsByRole(role));
-}
-exports.creepCountByRole = creepCountByRole;
 function nestedGroupBy(arr, keys) {
     if (!keys.length) {
         return arr;
