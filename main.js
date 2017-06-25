@@ -78,7 +78,7 @@ module.exports =
 exports.__esModule = true;
 exports.ENABLE_PROFILER = true;
 exports.ENABLE_DEBUG = true;
-exports.DEBUG_THROTTLE = 1;
+exports.DEBUG_THROTTLE = 20;
 exports.CREEP_COUNT_WORKER = {
     RCL: {
         1: 4,
@@ -103,10 +103,8 @@ exports.BODY_WORKER = [WORK, CARRY, MOVE];
 
 exports.__esModule = true;
 var worker_1 = __webpack_require__(/*! ./worker */ 6);
-var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 9);
 var roles = {
-    worker: worker_1["default"],
-    fakeRole: fakeRole_1["default"]
+    worker: worker_1["default"]
 };
 exports["default"] = roles;
 
@@ -124,11 +122,11 @@ exports["default"] = roles;
 
 exports.__esModule = true;
 var harvest_1 = __webpack_require__(/*! ./harvest */ 7);
-var fakeAction_1 = __webpack_require__(/*! ./fakeAction */ 8);
+var fill_1 = __webpack_require__(/*! ./fill */ 14);
 ;
 exports.actions = {
     harvest: harvest_1.harvest,
-    fakeAction: fakeAction_1.fakeAction
+    fill: fill_1.fill
 };
 
 
@@ -17256,7 +17254,7 @@ function mainLoop() {
         var room = Game.rooms[i];
         var roomCreeps = ALL_CREEPS_SORTED[room.name];
         SpawnManager.run(room, roomCreeps);
-        if (Config.ENABLE_DEBUG)
+        if (Config.ENABLE_DEBUG && Game.time % Config.DEBUG_THROTTLE === 0)
             Utils.debugInfo(room, roomCreeps);
     }
 }
@@ -17283,13 +17281,11 @@ function availableSpawns(room) {
             return spawn.spawning === null;
         }
     });
-    console.log("availableSpawns() " + spawns.length + " spawns available");
     return spawns;
 }
 function spawnRequiredCreep(room, parts, role) {
     var spawns = availableSpawns(room);
     if (spawns.length === 0) {
-        console.log("sRC() no spawns currently available, probably busy. returning");
         return;
     }
     var spawn = spawns[0];
@@ -17342,7 +17338,15 @@ var module = {
     }
 };
 module.run = function run(creep) {
-    actions_1.actions.harvest(creep);
+    if (creep.carry.energy < creep.carryCapacity) {
+        var sources = creep.room.find(FIND_SOURCES);
+        var source = creep.pos.findClosestByPath(sources);
+        actions_1.actions.harvest(creep, source);
+    }
+    else {
+        var target = creep.room.find(FIND_MY_SPAWNS)[0];
+        actions_1.actions.fill(creep, target);
+    }
 };
 exports["default"] = module;
 
@@ -17359,59 +17363,18 @@ exports["default"] = module;
 "use strict";
 
 exports.__esModule = true;
-function harvest(creep) {
+function harvest(creep, source) {
     creep.say("harvest");
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(source);
+    }
 }
 exports.harvest = harvest;
 
 
 /***/ }),
-/* 8 */
-/*!***********************************!*\
-  !*** ./src/actions/fakeAction.ts ***!
-  \***********************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-function fakeAction(creep) {
-    creep.say("fakeAction");
-}
-exports.fakeAction = fakeAction;
-
-
-/***/ }),
-/* 9 */
-/*!*******************************!*\
-  !*** ./src/roles/fakeRole.ts ***!
-  \*******************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var actions_1 = __webpack_require__(/*! ./../actions */ 2);
-var module = {
-    body: [MOVE],
-    count: {
-        1: 1,
-        2: 1,
-        3: 1,
-        4: 1
-    }
-};
-module.run = function run(creep) {
-    actions_1.actions.fakeAction(creep);
-};
-exports["default"] = module;
-
-
-/***/ }),
+/* 8 */,
+/* 9 */,
 /* 10 */
 /*!****************************************!*\
   !*** ./src/components/creepManager.ts ***!
@@ -17819,7 +17782,6 @@ module.exports = {
 
 exports.__esModule = true;
 var _ = __webpack_require__(/*! lodash */ 3);
-var Config = __webpack_require__(/*! ../config */ 0);
 var roles_1 = __webpack_require__(/*! ./../roles */ 1);
 function nestedGroupBy(arr, keys) {
     if (!keys.length) {
@@ -17831,28 +17793,63 @@ function nestedGroupBy(arr, keys) {
 exports.nestedGroupBy = nestedGroupBy;
 ;
 function debugInfo(room, roomCreeps) {
-    if (Game.time % Config.DEBUG_THROTTLE === 0) {
-        console.log('<span style="color: slategray">=========================</span>');
-        console.log("<span style=\"font-size: 16px;color: springgreen\">" + room + " at " + Game.time + "</span>");
-        console.log('<span style="color: cornflowerblue">CONTROLLER</span>');
-        console.log("Level " + room.controller.level);
-        console.log("Progress " + room.controller.progress + "/" + room.controller.progressTotal + " (" + room.controller.progress / room.controller.progressTotal + "%)");
-        if (room.controller.ticksToDowngrade < 20000)
-            console.log("<span style=\"color: tomato\">Downgrade in " + room.controller.ticksToDowngrade + " ticks</span>");
-        console.log('<span style="color: cornflowerblue">STRUCTURES</span>');
-        console.log("Energy " + room.energyAvailable + " / " + room.energyCapacityAvailable + " capacity");
-        console.log('<span style="color: cornflowerblue">CREEPS</span>');
-        for (var role in roles_1["default"]) {
-            var max = roles_1["default"][role].count[room.controller.level];
-            var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
-            console.log(role + ": [" + current + "/" + max + "]");
-        }
-        ;
+    console.log('<span style="color: slategray">=========================</span>');
+    console.log("<span style=\"font-size: 16px;color: springgreen\">" + room + " at " + Game.time + "</span>");
+    console.log('<span style="color: cornflowerblue">CONTROLLER</span>');
+    console.log("Level " + room.controller.level);
+    console.log("Progress " + room.controller.progress + "/" + room.controller.progressTotal + " (" + room.controller.progress / room.controller.progressTotal + "%)");
+    if (room.controller.ticksToDowngrade < 20000)
+        console.log("<span style=\"color: tomato\">Downgrade in " + room.controller.ticksToDowngrade + " ticks</span>");
+    console.log('<span style="color: cornflowerblue">STRUCTURES</span>');
+    console.log("Energy " + room.energyAvailable + " / " + room.energyCapacityAvailable + " capacity");
+    console.log('<span style="color: cornflowerblue">CREEPS</span>');
+    for (var role in roles_1["default"]) {
+        var max = roles_1["default"][role].count[room.controller.level];
+        var current = (!roomCreeps || !roomCreeps[role]) ? 0 : roomCreeps[role].length;
+        console.log(role + ": [" + current + "/" + max + "]");
     }
     ;
 }
 exports.debugInfo = debugInfo;
 ;
+
+
+/***/ }),
+/* 14 */
+/*!*****************************!*\
+  !*** ./src/actions/fill.ts ***!
+  \*****************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+function fill(creep, target) {
+    if (!target)
+        target === creep.room.find(FIND_MY_SPAWNS)[0];
+    if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+        creep.say("fill move");
+        creep.moveTo(target);
+        console.log(creep.name);
+    }
+    else {
+        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_FULL) {
+            var dropPoint = new RoomPosition(target.pos.x, target.pos.y + 1, creep.pos.roomName);
+            if (creep.pos.x === dropPoint.x && creep.pos.y === dropPoint.y) {
+                console.log('=> ARRIVED', creep);
+                creep.drop(RESOURCE_ENERGY);
+                creep.say("fill drop");
+            }
+            else {
+                creep.moveTo(dropPoint);
+                console.log('moving to drop');
+            }
+        }
+    }
+}
+exports.fill = fill;
 
 
 /***/ })
