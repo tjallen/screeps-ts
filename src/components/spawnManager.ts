@@ -9,14 +9,14 @@ function availableSpawns(room: Room): Spawn[] {
       return spawn.spawning === null;
     }
   });
-  console.log(`availableSpawns() ${spawns.length} spawns available`);
+  // console.log(`availableSpawns() ${spawns.length} spawns available`);
   return spawns;
 }
 
 function spawnRequiredCreep(room: Room, parts: string[], role: string): void {
   const spawns = availableSpawns(room);
   if (spawns.length === 0) {
-    console.log(`sRC() no spawns currently available, probably busy. returning`);
+    // console.log(`sRC() no spawns currently available, probably busy. returning`);
     return;
   }
   const spawn = spawns[0];
