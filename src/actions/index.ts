@@ -1,10 +1,10 @@
 import { harvest } from './harvest';
-import { fakeAction } from './fakeAction';
+import { fill } from './fill';
 interface Actions {
-  harvest(creep: Creep): void;
-  fakeAction(creep: Creep): void;
+  harvest(creep: Creep, source: Source): void;
+  fill(creep: Creep, target?: any): void;
 };
 export const actions : Actions = {
   harvest,
-  fakeAction,
+  fill,
 };
