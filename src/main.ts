@@ -20,7 +20,7 @@ function mainLoop(): void {
     let room: Room = Game.rooms[i];
     let roomCreeps: object = ALL_CREEPS_SORTED[room.name];
     SpawnManager.run(room, roomCreeps);
-    if (Config.ENABLE_DEBUG) Utils.debugInfo(room, roomCreeps);
+    if (Config.ENABLE_DEBUG && Game.time % Config.DEBUG_THROTTLE === 0) Utils.debugInfo(room, roomCreeps);
   }
 }
 
