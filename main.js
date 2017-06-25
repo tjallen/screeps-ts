@@ -125,6 +125,7 @@ exports["default"] = roles;
 exports.__esModule = true;
 var harvest_1 = __webpack_require__(/*! ./harvest */ 7);
 var fakeAction_1 = __webpack_require__(/*! ./fakeAction */ 8);
+;
 exports.actions = {
     harvest: harvest_1.harvest,
     fakeAction: fakeAction_1.fakeAction

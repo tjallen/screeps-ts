@@ -1,6 +1,10 @@
 import { harvest } from './harvest';
 import { fakeAction } from './fakeAction';
-export const actions : object = {
+interface Actions {
+  harvest(creep: Creep): void;
+  fakeAction(creep: Creep): void;
+};
+export const actions : Actions = {
   harvest,
   fakeAction,
 };
