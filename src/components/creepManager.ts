@@ -3,7 +3,7 @@ import * as Config from './../config';
 import * as Utils from './../utils';
 import Roles from './../roles';
 
-export function run(creeps : object) {
+export function run(creeps : object): void {
   // fire role.run() for each creep
   _.forEach(creeps, (creep: Creep) => {
     // console.log('=>', creep)

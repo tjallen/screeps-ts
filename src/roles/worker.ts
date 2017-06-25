@@ -8,7 +8,7 @@ const module : any = {
     4: <number> 1,
   }
 };
-module.run = function run(creep: Creep) {
+module.run = function run(creep: Creep): void {
   actions.harvest(creep);
 }
 export default module;

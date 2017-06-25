@@ -61,7 +61,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -102,8 +102,8 @@ exports.BODY_WORKER = [WORK, CARRY, MOVE];
 "use strict";
 
 exports.__esModule = true;
-var worker_1 = __webpack_require__(/*! ./worker */ 5);
-var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 8);
+var worker_1 = __webpack_require__(/*! ./worker */ 6);
+var fakeRole_1 = __webpack_require__(/*! ./fakeRole */ 9);
 var roles = {
     worker: worker_1["default"],
     fakeRole: fakeRole_1["default"]
@@ -113,6 +113,26 @@ exports["default"] = roles;
 
 /***/ }),
 /* 2 */
+/*!******************************!*\
+  !*** ./src/actions/index.ts ***!
+  \******************************/
+/*! no static exports found */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var harvest_1 = __webpack_require__(/*! ./harvest */ 7);
+var fakeAction_1 = __webpack_require__(/*! ./fakeAction */ 8);
+exports.actions = {
+    harvest: harvest_1.harvest,
+    fakeAction: fakeAction_1.fakeAction
+};
+
+
+/***/ }),
+/* 3 */
 /*!***************************************!*\
   !*** ./node_modules/lodash/lodash.js ***!
   \***************************************/
@@ -17206,10 +17226,10 @@ exports["default"] = roles;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 10)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../webpack/buildin/module.js */ 11)(module)))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /*!*********************!*\
   !*** ./src/main.ts ***!
   \*********************/
@@ -17221,10 +17241,10 @@ exports["default"] = roles;
 
 exports.__esModule = true;
 var Config = __webpack_require__(/*! ./config */ 0);
-var SpawnManager = __webpack_require__(/*! ./components/spawnManager */ 4);
-var CreepManager = __webpack_require__(/*! ./components/creepManager */ 9);
-var Profiler = __webpack_require__(/*! screeps-profiler */ 11);
-var Utils = __webpack_require__(/*! ./utils */ 12);
+var SpawnManager = __webpack_require__(/*! ./components/spawnManager */ 5);
+var CreepManager = __webpack_require__(/*! ./components/creepManager */ 10);
+var Profiler = __webpack_require__(/*! screeps-profiler */ 12);
+var Utils = __webpack_require__(/*! ./utils */ 13);
 if (Config.ENABLE_PROFILER) {
     Profiler.enable();
 }
@@ -17243,7 +17263,7 @@ exports.loop = Config.ENABLE_PROFILER ? Profiler.wrap(mainLoop) : mainLoop;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /*!****************************************!*\
   !*** ./src/components/spawnManager.ts ***!
   \****************************************/
@@ -17263,13 +17283,11 @@ function availableSpawns(room) {
         }
     });
     console.log("availableSpawns() " + spawns.length + " spawns available");
-    if (spawns.length === 0)
-        return false;
     return spawns;
 }
 function spawnRequiredCreep(room, parts, role) {
     var spawns = availableSpawns(room);
-    if (!spawns) {
+    if (spawns.length === 0) {
         console.log("sRC() no spawns currently available, probably busy. returning");
         return;
     }
@@ -17301,7 +17319,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /*!*****************************!*\
   !*** ./src/roles/worker.ts ***!
   \*****************************/
@@ -17312,7 +17330,7 @@ exports.run = run;
 "use strict";
 
 exports.__esModule = true;
-var actions_1 = __webpack_require__(/*! ./../actions */ 13);
+var actions_1 = __webpack_require__(/*! ./../actions */ 2);
 var module = {
     body: [WORK, CARRY, MOVE],
     count: {
@@ -17329,7 +17347,7 @@ exports["default"] = module;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /*!********************************!*\
   !*** ./src/actions/harvest.ts ***!
   \********************************/
@@ -17347,7 +17365,7 @@ exports.harvest = harvest;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /*!***********************************!*\
   !*** ./src/actions/fakeAction.ts ***!
   \***********************************/
@@ -17365,7 +17383,7 @@ exports.fakeAction = fakeAction;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /*!*******************************!*\
   !*** ./src/roles/fakeRole.ts ***!
   \*******************************/
@@ -17376,7 +17394,7 @@ exports.fakeAction = fakeAction;
 "use strict";
 
 exports.__esModule = true;
-var actions_1 = __webpack_require__(/*! ./../actions */ 13);
+var actions_1 = __webpack_require__(/*! ./../actions */ 2);
 var module = {
     body: [MOVE],
     count: {
@@ -17393,7 +17411,7 @@ exports["default"] = module;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /*!****************************************!*\
   !*** ./src/components/creepManager.ts ***!
   \****************************************/
@@ -17404,7 +17422,7 @@ exports["default"] = module;
 "use strict";
 
 exports.__esModule = true;
-var _ = __webpack_require__(/*! lodash */ 2);
+var _ = __webpack_require__(/*! lodash */ 3);
 var roles_1 = __webpack_require__(/*! ./../roles */ 1);
 function run(creeps) {
     _.forEach(creeps, function (creep) {
@@ -17420,7 +17438,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -17453,7 +17471,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /*!***********************************************************!*\
   !*** ./node_modules/screeps-profiler/screeps-profiler.js ***!
   \***********************************************************/
@@ -17788,7 +17806,7 @@ module.exports = {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /*!****************************!*\
   !*** ./src/utils/index.ts ***!
   \****************************/
@@ -17799,7 +17817,7 @@ module.exports = {
 "use strict";
 
 exports.__esModule = true;
-var _ = __webpack_require__(/*! lodash */ 2);
+var _ = __webpack_require__(/*! lodash */ 3);
 var Config = __webpack_require__(/*! ../config */ 0);
 var roles_1 = __webpack_require__(/*! ./../roles */ 1);
 function creepsByRole(role) {
@@ -17842,26 +17860,6 @@ function debugInfo(room, roomCreeps) {
 }
 exports.debugInfo = debugInfo;
 ;
-
-
-/***/ }),
-/* 13 */
-/*!******************************!*\
-  !*** ./src/actions/index.ts ***!
-  \******************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var harvest_1 = __webpack_require__(/*! ./harvest */ 6);
-var fakeAction_1 = __webpack_require__(/*! ./fakeAction */ 7);
-exports.actions = {
-    harvest: harvest_1.harvest,
-    fakeAction: fakeAction_1.fakeAction
-};
 
 
 /***/ })

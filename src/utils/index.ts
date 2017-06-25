@@ -12,7 +12,7 @@ export function creepCountByRole(role: string) {
 
 // multi-level groupBy
 // https://gist.github.com/joyrexus/9837596
-export function nestedGroupBy(arr: any, keys: string[]) {
+export function nestedGroupBy(arr: any, keys: string[]): object {
     if (!keys.length) { return arr; }
     let [ first, ...rest ] = keys;
     return _.mapValues(_.groupBy(arr, first), value => nestedGroupBy(value, rest));

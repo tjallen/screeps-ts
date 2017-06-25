@@ -9,7 +9,7 @@ if (Config.ENABLE_PROFILER) {
   Profiler.enable();
 }
 
-function mainLoop() {
+function mainLoop(): void {
   // top level creeps object, nested tree by room > role > creeps
   const ALL_CREEPS_SORTED: object = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
   // console.log(JSON.stringify(ALL_CREEPS_SORTED, null, 2))

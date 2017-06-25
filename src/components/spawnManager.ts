@@ -3,20 +3,19 @@ import * as Config from './../config';
 import * as Utils from './../utils';
 import Roles from './../roles';
 
-function availableSpawns(room: Room) {
+function availableSpawns(room: Room): Spawn[] {
   const spawns: Spawn[] = room.find<Spawn>(FIND_MY_SPAWNS, {
     filter: (spawn: Spawn) => {
       return spawn.spawning === null;
     }
   });
   console.log(`availableSpawns() ${spawns.length} spawns available`);
-  if (spawns.length === 0) return false;
   return spawns;
 }
 
-function spawnRequiredCreep(room: Room, parts: string[], role: string) {
+function spawnRequiredCreep(room: Room, parts: string[], role: string): void {
   const spawns = availableSpawns(room);
-  if (!spawns) {
+  if (spawns.length === 0) {
     console.log(`sRC() no spawns currently available, probably busy. returning`);
     return;
   }
@@ -39,7 +38,7 @@ function spawnRequiredCreep(room: Room, parts: string[], role: string) {
   }
 }
 
-export function run(room: Room, roomCreeps: object | undefined) {
+export function run(room: Room, roomCreeps: object | undefined): void {
   // check creep counts in room vs config counts
   for (let role in Roles) {
     let max: number = Roles[role].count[room.controller.level];

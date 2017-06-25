@@ -1,3 +1,3 @@
-export function fakeAction (creep: Creep) {
+export function fakeAction (creep: Creep): void {
   creep.say(`fakeAction`);
 }
