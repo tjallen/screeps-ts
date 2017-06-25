@@ -9,6 +9,13 @@ const module : any = {
   }
 };
 module.run = function run(creep: Creep): void {
-  actions.harvest(creep);
+  if (creep.carry.energy < creep.carryCapacity) {
+    const sources = creep.room.find<Source>(FIND_SOURCES);
+    const source: Source = creep.pos.findClosestByPath(sources);
+    actions.harvest(creep, source);
+  } else {
+    const target = creep.room.find(FIND_MY_SPAWNS)[0];
+    actions.fill(creep, target);
+  }
 }
 export default module;
