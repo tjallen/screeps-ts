@@ -12,11 +12,19 @@ if (Config.ENABLE_PROFILER) {
 function mainLoop(): void {
   // top level creeps object, nested tree by room > role > creeps
   const ALL_CREEPS_SORTED: object = Utils.nestedGroupBy(Game.creeps, ['memory.spawnRoom', 'memory.role']);
-  // console.log(JSON.stringify(ALL_CREEPS_SORTED, null, 2))
   // run creep manager for each creep
   CreepManager.run(Game.creeps);
-  // run spawn manager for each room
+  // run room-specific stuff
   for (let i in Game.rooms) {
+    // source mineable spots for future use
+/*    const sources = Game.rooms[i].find<Source>(FIND_SOURCES);
+    sources.forEach(s => {
+      const terrain = s.room.lookForAtArea(LOOK_TERRAIN, s.pos.y-1, s.pos.x-1, s.pos.y+1, s.pos.x+1, true);
+      const spots = _.filter(terrain, (tile) => {
+        return tile.terrain === 'plain' || tile.terrain === 'swamp';
+      });
+      console.log(s.id, s.energy, spots.length);
+    });*/
     let room: Room = Game.rooms[i];
     let roomCreeps: object = ALL_CREEPS_SORTED[room.name];
     SpawnManager.run(room, roomCreeps);
