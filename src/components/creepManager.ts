@@ -5,9 +5,9 @@ import Roles from './../roles';
 
 function garbageCollection(creeps): void {
   // clear dead creeps from Memory
-  for (let index in Memory.creeps) {
-    if (!creeps[index]) {
-      delete Memory.creeps[index];
+  for (let creep in Memory.creeps) {
+    if (!creeps[creep]) {
+      delete Memory.creeps[creep];
     }
   }
 }
